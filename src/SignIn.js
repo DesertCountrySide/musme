@@ -1,4 +1,7 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
+import axios from "axios";
+import setAuthToken from "./utils/setAuthToken";
+import jwt_decode from "jwt-decode";
 import {
     View,
     Image,
@@ -7,28 +10,29 @@ import {
     TouchableOpacity,
     StyleSheet
   } from 'react-native';
-  import AuthContext from './context/AuthContext';
+import AuthContext from './context/AuthContext';
   
   const SignIn = () => {
     const status = useContext(AuthContext);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
   
-    const signInAction = (status) => {
-      // try {
-      //   if (password !== confirmPassword) {
-      //     Alert.alert("Password Mismatch", "Password and Confirm Password does not match.");
-      //   } else {
-      //     Auth.signUp(status.currUsername, password)
-      //     .then((data)=>{
-        status.setAuthState("signedIn");
-        status.setCurrentAuthScreen('SignIn')
-      //     })
-      //     .catch((error)=>{
-      //       Alert.alert(error.code, error.message);
-      //     });
-      //   }
-      // } catch (err) {
-      //   console.log('error signing up: ', err)
-      // }
+    const signInAction = () => {
+      const userData = {
+        email: email,
+        password: password
+      };
+      axios
+        .post("http://localhost:5000/api/users/login", userData)
+        .then(res => {
+          const { token } = res.data;
+          localStorage.setItem("jwtToken", token);
+          localStorage.setItem("user_email", email);
+          setAuthToken(token);
+          const decoded = jwt_decode(token);
+          status.setAuthState("signedIn")
+        })
+        .catch(err => alert(err));
     }
   
     return (
@@ -52,10 +56,8 @@ import {
             placeholderTextColor="#00"
             style={[styles.textInput, {color: "#00c4cc", outline: 'none'}]}
             autoCapitalize="none"
-            // onChangeText={val => {
-            //   (val.length != 0 && password.length != 0 && confirmPassword.length != 0) ? setIsButtonDisabled(false) : setIsButtonDisabled(true);
-            //   status.setCurrUsername(val)
-            // }}
+            onChangeText = {(val) => setEmail(val)}
+            value = {email}
           />
         </View>
         <View style={styles.action}>
@@ -65,31 +67,14 @@ import {
             secureTextEntry="true"
             style={[styles.textInput, {color: "#00c4cc", outline: 'none'}]}
             autoCapitalize="none"
-            // onChangeText={val => {
-            //   (val.length != 0 && status.currUsername.length != 0 && confirmPassword.length != 0) ? setIsButtonDisabled(false) : setIsButtonDisabled(true);
-            //   setPassword(val)
-            // }}
+            onChangeText = {(val) => setPassword(val)}
+            value = {password}
           />
-          <TouchableOpacity /*onPress={() => setSecurePasswordEntry(!securePasswordEntry)}*/>
-            {/* {securePasswordEntry ?
-              <Feather
-                name="eye-off"
-                color="grey"
-                size={20}
-              />
-              :
-              <Feather
-                name="eye"
-                color="grey"
-                size={20}
-              />
-            } */}
-          </TouchableOpacity>
         </View>
         <View>
           <TouchableOpacity
             style={styles.signUpBtn}
-            onPress={()=>signInAction(status)}
+            onPress={()=>signInAction()}
           >
             <Text style={styles.signUpBtnText}>LOGIN</Text>
           </TouchableOpacity>

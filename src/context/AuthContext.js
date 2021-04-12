@@ -24,17 +24,6 @@ export const AuthProvider = ({children}) => {
     setUsername(user);
   }
 
-  const signOut = async () => {
-    try {
-      //Player stop
-      //Expire JWT Token
-      console.log('signing out');
-      setState('signedOut');
-    } catch (error) {
-      console.log('error signing out: ', error);
-    }
-  };
-
   const status = {
     authState: state,
     setAuthState,
@@ -42,7 +31,6 @@ export const AuthProvider = ({children}) => {
     setCurrentAuthScreen,
     currUsername: username,
     setCurrUsername,
-    signOut,
   };
 
   return <AuthContext.Provider value={status}>{children}</AuthContext.Provider>;

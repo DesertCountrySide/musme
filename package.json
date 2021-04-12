@@ -6,15 +6,20 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "web": "react-scripts start",
-    "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "start": "node musme_backend/index.js",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install npm && run build"
   },
+  "proxy": "http://localhost:5000",
   "main": "./build/index.js",
   "dependencies": {
     "@babel/plugin-transform-react-jsx": "^7.13.12",
     "@react-navigation/native": "^5.9.3",
     "@react-navigation/stack": "^5.14.3",
+    "axios": "^0.21.1",
+    "classnames": "^2.3.1",
+    "jwt-decode": "^3.1.2",
     "multiselect-react-dropdown": "^1.6.11",
     "react": "16.13.1",
     "react-dom": "^17.0.2",
@@ -27,7 +32,11 @@
     "react-native-track-player": "^1.2.7",
     "react-native-vector-icons": "^8.1.0",
     "react-native-web": "^0.15.5",
-    "react-scripts": "^4.0.3"
+    "react-redux": "^7.2.3",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^4.0.3",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.13.14",
@@ -54,7 +63,8 @@
       {
         "loose": true
       }
-    ]
+    ],
+    "proxy": "http://localhost:5000"
   },
   "browserslist": {
     "production": [

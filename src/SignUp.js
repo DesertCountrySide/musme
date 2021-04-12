@@ -1,4 +1,6 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
+import axios from "axios";
+import setAuthToken from "./utils/setAuthToken";
 import {
     View,
     Image,
@@ -11,22 +13,24 @@ import {
   
   const SignUp = () => {
     const status = useContext(AuthContext);
-    const signUpAction = (status, password, confirmPassword) => {
-      // try {
-      //   if (password !== confirmPassword) {
-      //     Alert.alert("Password Mismatch", "Password and Confirm Password does not match.");
-      //   } else {
-      //     Auth.signUp(status.currUsername, password)
-      //     .then((data)=>{
-      //       status.setCurrentAuthScreen("Verify");
-      //     })
-      //     .catch((error)=>{
-      //       Alert.alert(error.code, error.message);
-      //     });
-      //   }
-      // } catch (err) {
-      //   console.log('error signing up: ', err)
-      // }
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [password2, setPassword2] = useState("");
+    const [error, setError] = useState({});
+
+    const signUpAction = () => {
+      const newUser = {
+        name: name,
+        email: email,
+        password: password,
+        password2: password2
+      };
+      console.log(newUser);
+      axios
+        .post("/api/users/register", newUser)
+        .then(res => status.setCurrentAuthScreen("SignIn")) 
+        .catch(err => alert(err));
     }
   
     return (
@@ -50,10 +54,8 @@ import {
             placeholderTextColor="#00"
             style={[styles.textInput, {color: "#00c4cc", outline: 'none'}]}
             autoCapitalize="none"
-            // onChangeText={val => {
-            //   (val.length != 0 && password.length != 0 && confirmPassword.length != 0) ? setIsButtonDisabled(false) : setIsButtonDisabled(true);
-            //   status.setCurrUsername(val)
-            // }}
+            onChangeText = {(val) => setName(val)}
+            value = {name}
           />
         </View>
         <View style={styles.action}>
@@ -62,10 +64,8 @@ import {
             placeholderTextColor="#00"
             style={[styles.textInput, {color: "#00c4cc", outline: 'none'}]}
             autoCapitalize="none"
-            // onChangeText={val => {
-            //   (val.length != 0 && password.length != 0 && confirmPassword.length != 0) ? setIsButtonDisabled(false) : setIsButtonDisabled(true);
-            //   status.setCurrUsername(val)
-            // }}
+            onChangeText = {(val) => setEmail(val)}
+            value = {email}
           />
         </View>
         <View style={styles.action}>
@@ -75,26 +75,9 @@ import {
             secureTextEntry="true"
             style={[styles.textInput, {color: "#00c4cc", outline: 'none'}]}
             autoCapitalize="none"
-            // onChangeText={val => {
-            //   (val.length != 0 && status.currUsername.length != 0 && confirmPassword.length != 0) ? setIsButtonDisabled(false) : setIsButtonDisabled(true);
-            //   setPassword(val)
-            // }}
+            onChangeText = {(val) => setPassword(val)}
+            value = {password}
           />
-          <TouchableOpacity /*onPress={() => setSecurePasswordEntry(!securePasswordEntry)}*/>
-            {/* {securePasswordEntry ?
-              <Feather
-                name="eye-off"
-                color="grey"
-                size={20}
-              />
-              :
-              <Feather
-                name="eye"
-                color="grey"
-                size={20}
-              />
-            } */}
-          </TouchableOpacity>
         </View>
         <View style={styles.action}>
           <TextInput
@@ -103,30 +86,14 @@ import {
             secureTextEntry="true"
             style={[styles.textInput, {color: "#00c4cc", outline: 'none'}]}
             autoCapitalize="none"
-            // onChangeText={val => {
-            //   (val.length != 0 && status.currUsername.length != 0 && password.length != 0) ? setIsButtonDisabled(false) : setIsButtonDisabled(true);
-            //   setConfirmPassword(val)
-            // }}
+            onChangeText = {(val) => setPassword2(val)}
+            value = {password2}
           />
-          {/* <TouchableOpacity onPress={() => setSecureConfirmPasswordEntry(!secureConfirmPasswordEntry)}>
-            {secureConfirmPasswordEntry ?
-              <Feather
-                name="eye-off"
-                color="grey"
-                size={20}
-              />
-              :
-              <Feather
-                name="eye"
-                color="grey"
-                size={20}
-              />
-            }
-          </TouchableOpacity> */}
         </View>
         <View>
           <TouchableOpacity
             style={styles.signUpBtn}
+            onPress={() => signUpAction()}
           >
             <Text style={styles.signUpBtnText}>SIGN UP</Text>
           </TouchableOpacity>
