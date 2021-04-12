@@ -9,7 +9,7 @@
     "test": "jest",
     "lint": "eslint .",
     "start": "node musme_backend/index.js",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install npm && run build"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build"
   },
   "engines": {
     "node": "12.18.2"
