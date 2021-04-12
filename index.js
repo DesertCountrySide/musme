@@ -1,32 +1,83 @@
 const express = require('express')
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const passport = require("passport");
+const users = require("./routes/api/users");
+const ecwid = require("./routes/api/ecwid");
 const cors = require('cors')
 const got = require('got')
 const app = express()
-const port = 3000
-const MongoClient = require('mongodb').MongoClient
-const connectionString = "mongodb+srv://musme:vedangmusme@cluster0.zovag.mongodb.net/MusMeDB?retryWrites=true&w=majority"
-const secretToken = "secret_yjrwZASe4jNqg571avHhSfgDbKegqLRQ"
-const storeId = 36603154
-const ordersURL = `https://app.ecwid.com/api/v3/${storeId}/orders?token=${secretToken}`
-const productsURL = `https://app.ecwid.com/api/v3/${storeId}/products?token=${secretToken}`
-const categoryURL = `https://app.ecwid.com/api/v3/${storeId}/categories?token=${secretToken}&productIds=true`
 
-app.get('/getAudio', cors() ,(req, res) => {
-    try {
-      const audioURL = req.query.adminUrl
-      console.log(audioURL)
-      fetch(audioURL).then((response)=>{
-        console.log(response)
-        res.send(response)
-      })
-    } catch (error) {
-      console.log(error.response);
-    }
-})
+app.use(
+  bodyParser.urlencoded({
+    extended: false
+  })
+);
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+app.use(bodyParser.json());
+app.use(cors());
+
+// DB Config
+const db = require("./config/keys").mongoURI;
+
+// Connect to MongoDB
+mongoose
+  .connect(
+    db,
+    { useNewUrlParser: true , useUnifiedTopology: true }
+  )
+  .then(() => console.log("MongoDB sucessfully connected"))
+  .catch(err => console.log(err));
+
+// Passport middleware
+app.use(passport.initialize());
+// Passport config
+require("./config/passport")(passport);
+// Routes
+app.use("/api/users", users);
+app.use("/api/ecwid", ecwid);
+
+const port = process.env.PORT || 5000;
+
+app.listen(port, () => console.log(`Helloed ${port} !`));
+
+//   (async () => {
+//     try {
+//       const audioURL = req.query.adminUrl
+//       const response = await got(audioURL, {contentType: 'blob'})
+//       // res.type('blob')
+//       // console.log();
+//       // res.send({'test':response})
+//       // const buffer = Buffer.from([response]);
+//       // res.send(buffer)
+//       // console.log(response.body)
+//       res.type('blob')
+//       res.contentType('audio/mp3')
+//       res.send(response.body)
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   })();
+  // (async () => {
+  //   try {
+      
+  //   //   await got(audioURL).then(response => 
+  //   //     response.blob().then(data => ({
+  //   //       data: data,
+  //   //       status: response.status
+  //   //     })
+  //   //   ).then(resp => {
+  //   //     console.log("response")
+  //   //   }))
+  //   // } catch(e){
+  //   //   console.log(e)
+  //   // }
+  // })();
+// })
+
+// app.listen(port, () => {
+//   console.log(`Example app listening at http://localhost:${port}`)
+// })
 
 
 // MongoClient.connect(connectionString, {useUnifiedTopology: true}, (err, client) => {
