@@ -1,5 +1,6 @@
 {
-  "name": "musme_frontend",
+  "name": "musme",
+  "homepage": "http://musmeapp.com",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -9,12 +10,13 @@
     "test": "jest",
     "lint": "eslint .",
     "start": "node musme_backend/index.js",
+    "build": "webpack",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build"
   },
   "engines": {
     "node": "12.18.2"
   },
-  "proxy": "http://localhost:5000",
+  "proxy": "https://boiling-ravine-51709.herokuapp.com/",
   "main": "./build/index.js",
   "dependencies": {
     "@babel/plugin-transform-react-jsx": "^7.13.12",
@@ -50,7 +52,8 @@
     "@react-native-community/eslint-config": "^1.1.0",
     "eslint": "^7.23.0",
     "metro-react-native-babel-preset": "^0.59.0",
-    "react-test-renderer": "16.13.1"
+    "react-test-renderer": "16.13.1",
+    "webpack-cli": "^4.6.0"
   },
   "jest": {
     "preset": "react-native"

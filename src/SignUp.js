@@ -10,8 +10,10 @@ import {
     StyleSheet
   } from 'react-native'
   import AuthContext from './context/AuthContext';
+  const userSignUpEndPoint = `${process.env.REACT_APP_END_POINT}api/users/register`
   
   const SignUp = () => {
+    document.title = "MusMeApp"
     const status = useContext(AuthContext);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -26,10 +28,16 @@ import {
         password: password,
         password2: password2
       };
-      console.log(newUser);
       axios
-        .post("/api/users/register", newUser)
-        .then(res => status.setCurrentAuthScreen("SignIn")) 
+        .post(userSignUpEndPoint, newUser)
+        .then(res => {
+          if(res.data.type != undefined && res.data.type == "error"){
+            alert(Object.values(res.data.error)[0]);
+          }else{
+            alert("You are registered successfully...Login to continue.");
+            status.setCurrentAuthScreen("SignIn")
+          }
+        })
         .catch(err => alert(err));
     }
   
@@ -43,7 +51,7 @@ import {
         }}>
           {/* #b7ede2 */}
         <Image
-          style={{width: 500, height: 225, marginBottom: 20}}
+          style={{width: 300, height: 150, marginBottom: 20}}
           source={{
             uri: "https://i.ibb.co/4jwZbFD/musme-logo.png"
           }}

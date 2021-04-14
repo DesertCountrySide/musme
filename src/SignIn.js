@@ -11,8 +11,10 @@ import {
     StyleSheet
   } from 'react-native';
 import AuthContext from './context/AuthContext';
+const userLoginEndPoint = `${process.env.REACT_APP_END_POINT}api/users/login`
   
   const SignIn = () => {
+    document.title = "MusMeApp"
     const status = useContext(AuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -23,14 +25,18 @@ import AuthContext from './context/AuthContext';
         password: password
       };
       axios
-        .post("http://localhost:5000/api/users/login", userData)
+        .post(userLoginEndPoint, userData)
         .then(res => {
-          const { token } = res.data;
-          localStorage.setItem("jwtToken", token);
-          localStorage.setItem("user_email", email);
-          setAuthToken(token);
-          const decoded = jwt_decode(token);
-          status.setAuthState("signedIn")
+          if(res.data.type != undefined && res.data.type == "error"){
+            alert(Object.values(res.data.error)[0]);
+          }else{
+            const { token } = res.data;
+            localStorage.setItem("jwtToken", token);
+            localStorage.setItem("user_email", email);
+            setAuthToken(token);
+            const decoded = jwt_decode(token);
+            status.setAuthState("signedIn")
+          }
         })
         .catch(err => alert(err));
     }
@@ -45,7 +51,7 @@ import AuthContext from './context/AuthContext';
         }}>
           {/* #b7ede2 */}
         <Image
-          style={{width: 500, height: 225, marginBottom: 20}}
+          style={{width: 300, height: 150, marginBottom: 20}}
           source={{
             uri: "https://i.ibb.co/4jwZbFD/musme-logo.png"
           }}

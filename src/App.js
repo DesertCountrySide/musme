@@ -12,6 +12,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import MainNavigator from './MainNavigator';
 
 const App = () => {
+  document.title = "MusMeApp"
   return (
     <AuthProvider>
         <NavigationContainer>
