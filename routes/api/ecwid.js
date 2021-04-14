@@ -29,13 +29,13 @@ router.post("/orders", (req, res) => {
         fetch(ordersURL).then(response => {
             response.json().then(response1 => {
                 var orders = response1
-                var authObj;
+                var authObj = {};
                 for(var x in orders.items){
                     if(orders.items[x].email == email){
                         authObj = orders.items[x];
                     }
                 }
-                if(authObj.paymentStatus == "PAID" && authObj.items[0].categoryId == subscriptionCategoryId) {
+                if(authObj != undefined && authObj.paymentStatus == "PAID" && authObj.items[0].categoryId == subscriptionCategoryId) {
                     const currDate = new Date();
                     const diffDays = Math.ceil(Math.abs(currDate - authObj.createDate) / (1000 * 60 * 60 * 24));
                     if((authObj.items[0].productId == annualsubscriptionProductId && diffDays > 365) || (authObj.items[0].productId == monthlysubscriptionProductId && diffDays > 30)){
