@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys"); 
 const ordersURL = `https://app.ecwid.com/api/v3/${keys.storeId}/orders?token=${keys.ecwidApiSecret}`;
-const productsURL = `https://app.ecwid.com/api/v3/${keys.storeId}/products?token=${keys.ecwidApiSecret}`;
+const productsURL = `https://app.ecwid.com/api/v3/${keys.storeId}/products?token=${keys.ecwidApiSecret}&enabled=true`;
 const categoryURL = `https://app.ecwid.com/api/v3/${keys.storeId}/categories?token=${keys.ecwidApiSecret}&productIds=true&parent=60789679`;
 const subscriptionCategoryId = 60789679;
 const monthlysubscriptionProductId = 244216912;
@@ -75,7 +75,9 @@ router.get("/products", (req, res) => {
                 for(var x in category.items){
                     productIds = productIds.concat(category.items[x].productIds)
                 }
-                var productList = [...new Set(productIds)].join()
+                productIds = [...new Set(productIds)]
+                productIds = productIds.slice(0, 99)
+                var productList = productIds.join()
                 fetch(productsURL+"&productId="+productList).then(response2 =>
                     response2.json().then(response3 => {
                         res.json(response3.items)
