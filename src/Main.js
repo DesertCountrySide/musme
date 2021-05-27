@@ -15,6 +15,8 @@ const Main = () => {
     const [results, setResults] = useState([])
     const [searchResult, setSearchResult] = useState([])
     const [moods, setMoods] = useState([]);
+    const [selectedMood, setSelectedMood] = useState([]);
+    const [selectedTempo, setSelectedTempo] = useState([]);
     const [loaderHide, setLoaderHide] = useState("")
     const [subscribed, setSubscribed] = useState(true)
     const [audioSrc, setAudioSrc] = useState();
@@ -58,7 +60,7 @@ const Main = () => {
     const updateSearchResult = (searchTerm) => {
         setSearch(searchTerm);
         searchTerm == "" ? setSearchResult(results) : setSearchResult(results.filter(item => {
-            return item.name.toLowerCase().includes(searchTerm.toLowerCase())
+            return item.name.toLowerCase().includes(searchTerm.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedMood): "" && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedTempo) : ""
         }))
     }
 
@@ -69,32 +71,35 @@ const Main = () => {
     }
 
     const onMoodSelect = (selectedList, selectedItem) => {
+        setSelectedMood(selectedList.map(data => data.name))
         setSearchResult(results.filter(item => {
-            if(item.attributes[0] != undefined){
-                return item.attributes[0].value.includes(selectedList.map(data => data.name))
-            }
+            return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedList.map(data => data.name)): "" && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedTempo) : ""
         }))
     }
 
     const onTempoRemove = (selectedList, removedItem) => {
         var index = results.indexOf(removedItem);
         index > -1 ? results.splice(index, 1) : ""
-        setSearchResult(results)
+        setSelectedTempo([])
+        setSearchResult(results.filter(item => {
+            return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedList.map(data => data.name)): "" && (item.attributes[6] != undefined) ? item.attributes[6].value.includes([]) : ""
+        }))
     }
 
     const onTempoSelect = (selectedList, selectedItem) => {
-        console.log(results);
+        setSelectedTempo(selectedList.map(data => data.name))
         setSearchResult(results.filter(item => {
-            if(item.attributes[6] != undefined){
-                return item.attributes[6].value.includes(selectedList.map(data => data.name))
-            }
+            return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedMood): "" && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedList.map(data => data.name)) : ""
         }))
     }
 
     const onMoodRemove = (selectedList, removedItem) => {
         var index = results.indexOf(removedItem);
         index > -1 ? results.splice(index, 1) : ""
-        setSearchResult(results)
+        setSelectedMood([])
+        setSearchResult(results.filter(item => {
+            return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes([]): "" && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedTempo) : ""
+        }))
     }
 
     const downloadAudio = (item) => {
@@ -181,7 +186,7 @@ const Main = () => {
                 showsHorizontalScrollIndicator={false}
                 data={searchResult}
                 numColumns={1}
-                keyExtractor={result => result.name}
+                keyExtractor={result => (result.id).toString()}
                 renderItem={({item}) => {
                     return (
                         <View style={styles.row}>
