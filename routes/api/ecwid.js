@@ -66,14 +66,14 @@ router.post("/orders", (req, res) => {
 router.get("/products", (req, res) => {
     //Authorization Check starts
     
-    // var token = "";
-    // var bearerToken = req.headers.authorization;
-    // if(bearerToken){
-    //     token = bearerToken.split(" ")[1]
-    // }
-    // jwt.verify(token, keys.secretOrKey, (err, decoded) => {
-    //     if (err) return res.status(500).send({ auth: false, message: 'Unauthorized Access' });
-    // }); 
+    var token = "";
+    var bearerToken = req.headers.authorization;
+    if(bearerToken){
+        token = bearerToken.split(" ")[1]
+    }
+    jwt.verify(token, keys.secretOrKey, (err, decoded) => {
+        if (err) return res.status(500).send({ auth: false, message: 'Unauthorized Access' });
+    }); 
     //Authorization Check Ends
     try{
         //for(let x = 0; x < counter; x++) {ß
