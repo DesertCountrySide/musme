@@ -12,7 +12,7 @@ const subscriptionCategoryId = 60789679;
 const monthlysubscriptionProductId = 244216912;
 const annualsubscriptionProductId = 244222503;
 let counter = 3;
-let j = 0
+let j = 1
 
 
 
@@ -106,7 +106,7 @@ router.get("/products", (req, res) => {
                                 //console.log(jsonArr.length)
                                 //console.log(i)
                                 //j == count
-                                if(j == count){
+                                if(i==count){
                                     //convert array to json 
                                     //var jsonArr = JSON.parse(JSON.stringify(mainArray))
                                     //var jsonArr = Object.assign({}, mainArray)
