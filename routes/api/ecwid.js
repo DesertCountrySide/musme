@@ -12,7 +12,7 @@ const subscriptionCategoryId = 60789679;
 const monthlysubscriptionProductId = 244216912;
 const annualsubscriptionProductId = 244222503;
 let counter = 3;
-let j = 1
+let j = 0
 
 
 
@@ -76,95 +76,61 @@ router.get("/products", (req, res) => {
     }); 
     //Authorization Check Ends
     try{
-        res.json({"test":"hell"})
-        //for(let x = 0; x < counter; x++) {ß
-            
+            fetch(categoryURL).then(response => {
+                response.json().then(response1 => {
 
-            // fetch(categoryURL).then(response => {
-            //     response.json().then(response1 => {
-
-            //         var category = response1
-            //         var productIds = [];
-            //         for(var x in category.items){
-            //             productIds = productIds.concat(category.items[x].productIds)
-            //         }
-            //         //console.log("fetching")
-            //         //every product get puts in productIDs 
-            //         //productIds = [...new Set(productIds)]
-            //         productIdsSet = [...new Set(productIds)]
-            //         //first 100 products get seperated
-            //         var count = Math.ceil(productIdsSet.length / 100)
-            //         //console.log(productIdsSet.length)
-            //         //
-            //         let mainArray = []
-            //         let first = 0
-            //         let second = 99
-            //         //var mainArray = new Array()
-                    
-            //         productIds1 = productIdsSet.slice(first,second)
-
-                    
-            //          //productIds2 = productIdsSet.slice(300,399)
-            //         //productIds3 = productIdsSet.slice(200,299)
-            //         //console.log(productIds2)
-
-            //         //productIds = productIds.slice(first, second)
-                    
-            //         var productList = productIds1.join()
-
-            //         //console.log(productList)
-            //         //var productList2 = productIds2.join()
-            //         //var productList3 = productIds3.join()
-
-            //         var jsonArr = []
-            //         for(let i = 0; i<count;i++){
-            //             fetch(productsURL+"&productId="+productList).then(response2 =>
-            //                 response2.json().then(response3 => {
-            //                     //res.json(response3.items)
-            //                     //mainArray.push(response3.items)     //object items get pushed to array
-            //                     jsonArr.push(...(response3.items))
-            //                     //console.log(jsonArr.length)
+                    var category = response1
+                    var productIds = [];
+                    for(var x in category.items){
+                        productIds = productIds.concat(category.items[x].productIds)
+                    }
+                    //console.log("fetching")
+                    //every product get puts in productIDs 
+                    //productIds = [...new Set(productIds)]
+                    productIdsSet = [...new Set(productIds)]
+                    //first 100 products get seperated
+                    var count = Math.ceil(productIdsSet.length / 100)
+                    let mainArray = []
+                    let first = 0
+                    let second = 99
+                    console.log(productIdsSet.length)
+                    productIds1 = productIdsSet.slice(first,second)
+                    var productList = productIds1.join()
+                    var jsonArr = []
+                    for(let i = 0; i<=count;i++){
+                        fetch(productsURL+"&productId="+productList).then(response2 =>
+                            response2.json().then(response3 => {
+                                //res.json(response3.items)
+                                //mainArray.push(response3.items)     //object items get pushed to array
+                                jsonArr.push(...(response3.items))
+                                //console.log(jsonArr.length)
+                                //console.log(i)
+                                //j == count
+                                if(j == count){
+                                    //convert array to json 
+                                    //var jsonArr = JSON.parse(JSON.stringify(mainArray))
+                                    //var jsonArr = Object.assign({}, mainArray)
+                                    //console.log(jsonArr.length)
+                                    //var jsonArr = [...mainArray[0], ...mainArray[1], ...mainArray[2]]
+                                    res.json(jsonArr)   //returns []
+                                }
+                                j+=1
+                                //console.log(i)
                                 
-            //                     //i== count - 1
-            //                     if(j == count){
-            //                         //convert array to json 
-            //                         //var jsonArr = JSON.parse(JSON.stringify(mainArray))
-            //                         //var jsonArr = Object.assign({}, mainArray)
-            //                         //console.log(jsonArr.length)
-            //                         //var jsonArr = [...mainArray[0], ...mainArray[1], ...mainArray[2]]
-            //                         res.json(jsonArr)   //returns []
-            //                     }
-            //                     j+=1
-                                
-            //                 })
+                            })
                             
-            //             )
-            //             productIdsSet = [...new Set(productIds)]
-            //             first += 100
-            //             second += 100
-            //             //console.log(productIds)
-            //             productIds1 = productIdsSet.slice(first,second) 
-            //             productList = productIds1.join()
+                        )
+                        productIdsSet = [...new Set(productIds)]
+                        first += 100
+                        second += 100
+                        //console.log(productIds)
+                        productIds1 = productIdsSet.slice(first,second) 
+                        productList = productIds1.join()
                         
                         
-            //         }
-
-            //         //mainArray.push(response3.items);
-            //         // var productList2 = productIds.join()
-            //         // fetch(productsURL+"&productId="+productList2).then(response2 =>
-            //         //     response2.json().then(response3 => {
-            //         //         res.json(response3.items)
-            //         //     })
-            //         // )
-
-            //         // var productList3 = productIds.join()
-            //         // fetch(productsURL+"&productId="+productList3).then(response2 =>
-            //         //     response2.json().then(response3 => {
-            //         //         res.json(response3.items)
-            //         //     })
-            //         // )
-            //     })
-            // });
+                    }
+                })
+            });
         //} 
     } catch (err) {
         console.log(err)
