@@ -93,7 +93,7 @@ router.get("/products", (req, res) => {
                     let mainArray = []
                     let first = 0
                     let second = 99
-                    console.log(productIdsSet.length)
+                    //console.log(productIdsSet.length)
                     productIds1 = productIdsSet.slice(first,second)
                     var productList = productIds1.join()
                     var jsonArr = []
