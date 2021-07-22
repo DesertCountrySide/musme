@@ -11,7 +11,7 @@ const categoryURL = `https://app.ecwid.com/api/v3/${keys.storeId}/categories?tok
 const subscriptionCategoryId = 60789679;
 const monthlysubscriptionProductId = 244216912;
 const annualsubscriptionProductId = 244222503;
-let counter = 3;
+let counter = 0;
 let j = 1
 
 
@@ -80,11 +80,12 @@ router.get("/products", (req, res) => {
                 response.json().then(response1 => {
 
                     var category = response1
+
                     var productIds = [];
                     for(var x in category.items){
                         productIds = productIds.concat(category.items[x].productIds)
                     }
-                    //console.log("fetching")
+                    //console.log(productIds)
                     //every product get puts in productIDs 
                     //productIds = [...new Set(productIds)]
                     productIdsSet = [...new Set(productIds)]
@@ -92,30 +93,43 @@ router.get("/products", (req, res) => {
                     var count = Math.ceil(productIdsSet.length / 100)
                     let mainArray = []
                     let first = 0
-                    let second = 99
-                    //console.log(productIdsSet.length)
+                    let second = 100
+                    for(let item of productIdsSet){
+                        counter++
+                        
+                    }
+                    //console.log(counter)
+                    //console.log(productIdsSet)
+                    console.log(productIdsSet.length)
+                    //console.log(count)
                     productIds1 = productIdsSet.slice(first,second)
                     var productList = productIds1.join()
                     var jsonArr = []
-                    for(let i = 0; i<=count;i++){
+                    for(let i = 0; i<count;i++){
                         fetch(productsURL+"&productId="+productList).then(response2 =>
                             response2.json().then(response3 => {
-                                //res.json(response3.items)
+                                //res.json(response.items)
+                                //console.log(response2)
                                 //mainArray.push(response3.items)     //object items get pushed to array
                                 jsonArr.push(...(response3.items))
                                 //console.log(jsonArr.length)
                                 //console.log(i)
-                                //j == count
-                                if(i==count){
+                                //i == count - 1
+                                if(j===count){
                                     //convert array to json 
                                     //var jsonArr = JSON.parse(JSON.stringify(mainArray))
                                     //var jsonArr = Object.assign({}, mainArray)
                                     //console.log(jsonArr.length)
                                     //var jsonArr = [...mainArray[0], ...mainArray[1], ...mainArray[2]]
                                     res.json(jsonArr)   //returns []
+                                    console.log(jsonArr.length)
+                                   console.log(j)
+                                   return  
                                 }
-                                j+=1
-                                //console.log(i)
+                               // console.log(jsonArr.length)
+                            
+                                j++
+                                console.log(j)
                                 
                             })
                             
