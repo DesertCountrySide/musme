@@ -6,48 +6,100 @@ import axios from "axios";
 import setAuthToken from "./utils/setAuthToken";
 import AuthContext from './context/AuthContext';
 import { Multiselect } from 'multiselect-react-dropdown';
-const API_KEY = process.env.REACT_APP_API_KEY
-const ordersEndPoint = `${process.env.REACT_APP_END_POINT}api/ecwid/orders`
-const productsEndPoint = `${process.env.REACT_APP_END_POINT}api/ecwid/products`
+const API_KEY = process.env.REACT_APP_API_KEY;
+const ordersEndPoint = `${process.env.REACT_APP_END_POINT}api/ecwid/orders`;
+const productsEndPoint = `${process.env.REACT_APP_END_POINT}api/ecwid/products`;
 
 const Main = () => {
-    const [search, setSearch] = useState("")
-    const [results, setResults] = useState([])
-    const [searchResult, setSearchResult] = useState([])
+    const [search, setSearch] = useState("");
+    const [results, setResults] = useState([]);
+    const [searchResult, setSearchResult] = useState([]);
     const [moods, setMoods] = useState([]);
+
+    const [tempo, setTempo] = useState([]);
+
+    const [bpm, setBPM] = useState([]);
+
     const [selectedMood, setSelectedMood] = useState([]);
     const [selectedTempo, setSelectedTempo] = useState([]);
-    const [loaderHide, setLoaderHide] = useState("")
-    const [subscribed, setSubscribed] = useState(true)
+    const [loaderHide, setLoaderHide] = useState("");
+    const [subscribed, setSubscribed] = useState(true);
     const [audioSrc, setAudioSrc] = useState();
-    const audioRef = useRef()
-    const status = useContext(AuthContext);
-    document.title = "MusMeApp"
 
+    const [selectedBPM, setSelectedBPM] = useState([]);
+
+    const audioRef = useRef();
+    const status = useContext(AuthContext);
+    document.title = "MusMeApp";
+
+    //making a new array to try and push the certain attributes that a customer may want to filter.
+    // By doing this, the goal is to try and get all 3 filter (mood,tempo,BPM) working together simutaniously
+    var filterArray = [];
+
+    //What this is doing is getting login information 
     useEffect(()=>{
         try {
             var moodArray = [];
+            var tempoArray = [];
+            var bpmArray = [];
             const email = localStorage.getItem("user_email");
             axios.post(ordersEndPoint, {"email": email})
                 .then(response => {
-                    if(!response.data.isSubscribed){
-                        setSubscribed(false)
-                    }else{
+                    if(!response.data.isSubscribed)
+                    {
+                        setSubscribed(false);
+                    }
+                    else
+                    {
                         axios.get(productsEndPoint)
                         .then(response => {
                             setResults(response.data)
                             setSearchResult(response.data)
                             for(var item in response.data){
-                                if(response.data[item].attributes[0] != undefined){
+                                if(response.data[item].attributes[0] != undefined)
+                                {
                                     moodArray = moodArray.concat(response.data[item].attributes[0].value.split(', '))
+                                }
+
+                                if(response.data[item].attributes[6] != undefined)
+                                {
+                                    tempoArray = tempoArray.concat(response.data[item].attributes[6].value)
+                                    //tempoArray.sort(function(a,b) {return a-b})
+                                }
+
+                                if(response.data[item].attributes[2] != undefined)
+                                {
+                                    bpmArray = bpmArray.concat(response.data[item].attributes[2].value)
+                                    bpmArray.sort(function(a,b) {return a-b})
                                 }
                             }
                             moodArray = [...new Set(moodArray)]
                             var newMoodArr = []
-                            for(var moodItem in moodArray){
+                            for(var moodItem in moodArray)
+                            {
                                 newMoodArr.push({'name': moodArray[moodItem]}) 
                             }
+
+                            tempoArray = [...new Set(tempoArray)]
+                            var newTempoArray = []
+                            for(var tempoItem in tempoArray)
+                            {
+                                newTempoArray.push({'name': tempoArray[tempoItem]})
+                            }
+
+                            bpmArray = [...new Set(bpmArray)]
+                            var newBPMArray = []
+                            for(var BPMitem in bpmArray)
+                            {
+                                newBPMArray.push({'name' : bpmArray[BPMitem]})
+                            }
+
                             setMoods(newMoodArr)
+
+                            setTempo(newTempoArray)
+
+                            setBPM(newBPMArray)
+
                             setLoaderHide("none")
                         })
                     }
@@ -60,7 +112,10 @@ const Main = () => {
     const updateSearchResult = (searchTerm) => {
         setSearch(searchTerm);
         searchTerm == "" ? setSearchResult(results) : setSearchResult(results.filter(item => {
-            return item.name.toLowerCase().includes(searchTerm.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedMood): "" && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedTempo) : ""
+            return item.name.toLowerCase().includes(searchTerm.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedMood): "" 
+                && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedTempo) : ""
+                && (item.attributes[2] != undefined) ? item.attributes[2].value.includes(selectedBPM) : ""
+            
         }))
     }
 
@@ -70,37 +125,92 @@ const Main = () => {
         status.setAuthState("signedOut")
     }
 
-    const onMoodSelect = (selectedList, selectedItem) => {
-        setSelectedMood(selectedList.map(data => data.name))
-        setSearchResult(results.filter(item => {
-            return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedList.map(data => data.name)): "" && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedTempo) : ""
-        }))
+    const onMoodSelect = (selectedList, selectedItem) => 
+        {
+            setSelectedMood(selectedList.map(data => data.name))
+            setSearchResult(results.filter(item => {
+                return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedList.map(data => data.name)): "" 
+                    && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedList.map(data => data.name)) : ""
+                    && (item.attributes[2] != undefined) ? item.attributes[2].value.includes(selectedList.map(data => data.name)) : ""
+                
+            }));
+            
+            //return filterArray;
+        }
+
+    const onMoodRemove = (selectedList, removedItem) => 
+        {
+            var index = results.indexOf(removedItem);
+            index > -1 ? results.splice(index, 1) : ""
+            setSelectedMood([])
+            setSearchResult(results.filter(item => {
+                return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes([]): "" 
+                    && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedList.map(data => data.name)) : ""
+                    && (item.attributes[2] != undefined) ? item.attributes[2].value.includes(selectedList.map(data => data.name)) : ""
+                
+            }));
+            //return filterArray;
+        }
+
+    const onBPMSelect = (selectedList, selectedItem) => 
+    {    
+        setSelectedBPM(selectedList.map(data => data.name))
+        setSearchResult(results.filter(item => 
+            {
+                return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[2] != undefined) ? item.attributes[2].value.includes(selectedList.map(data => data.name)): "" 
+                    && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedList.map(data => data.name)) : ""
+                    && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedList.map(data => data.name)) : ""
+                
+            }));
+        //return filterArray;
+    }
+    const onBPMRemove = (selectedList, removedItem) => 
+    {
+        var index = results.indexOf(removedItem);
+        index > -1 ? results.splice(index, 1) : ""
+        setSelectedBPM([])
+        setSearchResult(results.filter(item => 
+            {
+                return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[2] != undefined) ? item.attributes[2].value.includes([]): "" 
+                    && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedList.map(data => data.name)) : ""
+                    && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedList.map(data => data.name)) : ""
+                
+            }));
+        //return filterArray;
     }
 
-    const onTempoRemove = (selectedList, removedItem) => {
+    const onTempoSelect = (selectedList, selectedItem) => 
+    {
+            setSelectedTempo(selectedList.map(data => data.name))
+            setSearchResult(results.filter(item => 
+            {
+                return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedList.map(data => data.name)): "" 
+                    && (item.attributes[2] != undefined) ? item.attributes[2].value.includes(selectedList.map(data => data.name)) : ""
+                    && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedList.map(data => data.name)) : ""
+                
+            }));
+            //return filterArray;
+    }
+
+    const onTempoRemove = (selectedList, removedItem) => 
+    {
         var index = results.indexOf(removedItem);
         index > -1 ? results.splice(index, 1) : ""
         setSelectedTempo([])
-        setSearchResult(results.filter(item => {
-            return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedList.map(data => data.name)): "" && (item.attributes[6] != undefined) ? item.attributes[6].value.includes([]) : ""
-        }))
+        setSearchResult(results.filter(item => 
+            {
+                return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[6] != undefined) ? item.attributes[6].value.includes([]): "" 
+                    && (item.attributes[2] != undefined) ? item.attributes[2].value.includes(selectedList.map(data => data.name)) : ""
+                    && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedList.map(data => data.name)) : ""
+                
+            }));
+        //return filterArray;
     }
+   
 
-    const onTempoSelect = (selectedList, selectedItem) => {
-        setSelectedTempo(selectedList.map(data => data.name))
-        setSearchResult(results.filter(item => {
-            return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes(selectedMood): "" && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedList.map(data => data.name)) : ""
-        }))
-    }
 
-    const onMoodRemove = (selectedList, removedItem) => {
-        var index = results.indexOf(removedItem);
-        index > -1 ? results.splice(index, 1) : ""
-        setSelectedMood([])
-        setSearchResult(results.filter(item => {
-            return item.name.toLowerCase().includes(search.toLowerCase()) && (item.attributes[0] != undefined) ? item.attributes[0].value.includes([]): "" && (item.attributes[6] != undefined) ? item.attributes[6].value.includes(selectedTempo) : ""
-        }))
-    }
+
+    
 
     const downloadAudio = (item) => {
         try {
@@ -163,7 +273,8 @@ const Main = () => {
                 </View>
                 <View style = {styles.multiselectContainer}>
                     <Multiselect
-                        options={[{"name": "Very Slow"}, {"name": "Slow"}, {"name": "Medium"}, {"name": "Fast"}, {"name": "Very Fast"}]}
+                        //options={[{"name": "Very Slow"}, {"name": "Slow"}, {"name": "Medium"}, {"name": "Fast"}, {"name": "Very Fast"}]}
+                        options = {tempo}
                         showCheckbox="true"
                         onSelect={onTempoSelect}
                         onRemove={onTempoRemove}
@@ -172,6 +283,22 @@ const Main = () => {
                         placeholder="Select Tempo"
                     />
                 </View>
+
+                
+                <View style = {styles.multiselectContainer}>
+                    <Multiselect
+                        //options = {[{"name": "70 BPM - 100 BPM"}, {"name": "101 BPM - 130 BPM"}, {"name": "131 BPM - 160 BPM"}, {"name": "161 BPM - 190 BPM"}, {"name": "190 BPM and over"}]}
+                        options = {bpm}
+                        showCheckbox = "true"
+                        onSelect = {onBPMSelect}
+                        onRemove = {onBPMRemove}
+                        displayValue = "name"
+                        selectionLimit = "1"
+                        placeholder = "Select BPM"
+                    />
+                </View>
+                
+
                 <View style={{backgroundColor: "black", height:30, flex: 1, justifyContent:"center", margin:10}}>
                     <TouchableOpacity onPress={() => logoutAction()}>
                         <Text style={{color:"white"}}>LOGOUT</Text>
@@ -200,6 +327,14 @@ const Main = () => {
                                         </Text>
                                         <Text numberOfLines={2} style={styles.moodTxt}>
                                             {(item.attributes[0] != undefined) ? `[Mood: ${item.attributes[0].value}]` : "[Mood: None]"}
+                                        </Text>
+
+                                        <Text numberOfLines={2} style={styles.moodTxt}>
+                                            {(item.attributes[6] != undefined) ? `[Tempo: ${item.attributes[6].value}]` : "[Tempo: None]"}
+                                        </Text>
+
+                                        <Text numberOfLines={2} style = {styles.moodTxt}>
+                                            {(item.attributes[2] != undefined) ? `[BPM: ${item.attributes[2].value}]` : "[BPM: None]"}
                                         </Text>
                                     </View>
                                 </TouchableOpacity>
