@@ -142,12 +142,12 @@ const Main = () => {
                 />
             </View>
             <View style={styles.atRow}>
-                <View style={styles.atRow}>
+                <View style={styles.multiselectContainer}>
                     <TextInput
                         style = {styles.input}
                         value = {search}
                         onChangeText = {(val) => updateSearchResult(val)}
-                        placeholder = "Enter music name"
+                        placeholder = "Keyword Search"
                     />
                 </View>
                 <View style = {styles.multiselectContainer}>
@@ -268,9 +268,11 @@ const styles = StyleSheet.create({
         resizeMode: 'contain'
     },
     input: {
-        height: 40,
-        margin: 10,
+        height: 35,
+        margin: 0,
         borderWidth: 1,
+		marginLeft: 10,
+		borderColor: "lightgrey"
     },
     atRow:{
         flexDirection: 'row',
