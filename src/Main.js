@@ -338,7 +338,7 @@ const Main = () => {
             />
             
             <center><label>Displaying {itemCount} songs of {itemCountTotal} </label></center>
-            <center> <Text> {itemCountTotal+1}</Text></center>
+            
         </ScrollView>
         
         <View>
